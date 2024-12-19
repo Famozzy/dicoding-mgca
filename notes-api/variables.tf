@@ -1,6 +1,4 @@
-variable "project_id" {
-  default = "dicoding-mgca-444907"
-}
+variable "project_id" {}
 
 variable "region" {
   default = "asia-southeast2"
