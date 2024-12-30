@@ -44,14 +44,15 @@ resource "google_compute_ssl_certificate" "ssl_cert" {
   certificate = file("./certificate.crt")
 }
 
-resource "google_compute_url_map" "https_lb" {
-  name            = "https-lb"
+resource "google_compute_url_map" "lb_url_map" {
+  name            = "lb-url-map"
   default_service = google_compute_backend_service.backend.self_link
 }
 
+# --- HTTPS Load Balancer ---
 resource "google_compute_target_https_proxy" "https_proxy" {
   name             = "https-proxy"
-  url_map          = google_compute_url_map.https_lb.self_link
+  url_map          = google_compute_url_map.lb_url_map.self_link
   ssl_certificates = [google_compute_ssl_certificate.ssl_cert.self_link]
 }
 
@@ -60,4 +61,17 @@ resource "google_compute_global_forwarding_rule" "https_forwarding_rule" {
   ip_protocol = "TCP"
   port_range  = "443"
   target      = google_compute_target_https_proxy.https_proxy.self_link
+}
+
+# --- HTTP Load Balancer ---
+resource "google_compute_target_http_proxy" "http_proxy" {
+  name             = "http-proxy"
+  url_map          = google_compute_url_map.lb_url_map.self_link
+}
+
+resource "google_compute_global_forwarding_rule" "http_forwarding_rule" {
+  name        = "http-forwarding-rule"
+  ip_protocol = "TCP"
+  port_range  = "80"
+  target      = google_compute_target_http_proxy.http_proxy.self_link
 }
