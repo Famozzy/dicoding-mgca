@@ -13,8 +13,6 @@ resource "google_project_iam_member" "reviewer" {
   member  = "group:reviewer_googlecloud@dicoding.com"
 }
 
-# TODO
-# resource "google_monitoring_dashboard" "dashboard" {
-#   dashboard_json = file("dashboard.json")
-# }
-
+resource "google_monitoring_dashboard" "dashboard" {
+  dashboard_json = file("./dashboard.json")
+}
